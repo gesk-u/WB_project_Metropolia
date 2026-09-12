@@ -133,10 +133,9 @@ function interleaveByVideo(flat) {
 }
 
 
-async function buildResponse(targetWord, page = 1, pageSize = 100) {
-    const vids = await findWordAcrossFinnishVideos(targetWord);
+function buildResponse(targetWord, matchesByVideo, page = 1, pageSize = 100) {
 
-    const flat = vids.flatMap( v =>
+    const flat = matchesByVideo.flatMap( v =>
         v.matches.map(m => ({
             videoId: v.video_id,
             startSec: m.timestamp,
@@ -175,4 +174,9 @@ async function buildResponse(targetWord, page = 1, pageSize = 100) {
 //   console.log(JSON.stringify(results, null, 25));
 // })();
 
-buildResponse('koira').then(r => console.log(JSON.stringify(r, null, 2)));
+buildResponse('koira').then(r => console.log(JSON.stringify(r, null, 2)))
+
+module.exports = {
+    findWordAcrossFinnishVideos,
+    buildResponse
+}
