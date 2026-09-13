@@ -36,7 +36,8 @@ function SearchBox({ onSearch }) {
             className='flex-1 py-[17.6px] px-[22.4px] outline-none text-[17px]'
           />
         
-        <button type='submit' className='flex flex-col justify-center items-center px-[25.6px] py-0 w-[101.2px] h-[62.78px] bg-[#EDE9E3] flex-none order-1 self-stretch grow-0 hover:bg-[#DDD8D0] transition-colors cursor-pointer'>ETSI</button> 
+        <button type='submit' className='flex flex-col justify-center items-center px-[25.6px] py-0 w-[101.2px] h-[62.78px] bg-[#EDE9E3] flex-none order-1 self-stretch grow-0 hover:bg-[#DDD8D0] transition-colors cursor-pointer'>
+          ETSI</button> 
           </div>
       </form>
     </div>
