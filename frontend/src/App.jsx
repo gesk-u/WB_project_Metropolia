@@ -1,4 +1,8 @@
+//uncomment when needed
 import SearchBox from './components/SearchBox';
+import Header from './components/Header';
+import SuggestionWords from './components/SuggestionWords';
+
 
 //////
 import Results from './components/Results';
@@ -11,15 +15,32 @@ function App() {
   }; 
 
 
-   return (
-    <div className="flex flex-col items-start p-0 w-full min-h-screen
-            bg-[#F4F1EC] flex-none 
-            order-none self-stretch grow-0">
-      {/* <SearchBox onSearch={handleSearch} /> */}
-      <Results/>
+   //return (
+    // <div className="flex flex-col items-start p-0 w-full min-h-screen
+    //         bg-[#F4F1EC] flex-none 
+    //         order-none self-stretch grow-0">
+
+
+    //       <Results/>
+    // </div>
+   //);
+
+       //starting the 1st page component
+
+  return (
+    <div className="app">
+      <Header/>
+      <main>
+        <SearchBox onSearch={handleSearch} />
+        <SuggestionWords
+          words={['kiitos', 'talvi', 'koira']}
+          onWordClick={handleSearch}
+        />
+      </main>
     </div>
   );
 
+  
 
 }
 
