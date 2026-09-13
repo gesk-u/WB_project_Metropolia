@@ -11,12 +11,21 @@ function SearchBox({ onSearch }) {
     };
 
     return (
-    <div className='search-box'>
-      <p className='search-box-description'>
-        Type a Finnish word — we find the moment it is spoken on YouTube
-      </p>
-      <form onSubmit={onSubmit} className='search-box-form'>
-        <div>
+      
+      <div className="flex flex-col items-center p-6 py-10 w-[720px] max-w-[768px]  mx-auto flex-none order-none grow-0">
+        <div className="flex flex-col items-center pb-8 w-full h-[49px] flex-none order-0 grow-0">
+            <p className=" h-[17px] font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] text-center tracking-[0.66px] text-[#C4BFB8] flex-none order-none grow-0">
+            Uses YouTube subtitles to find real pronunciation in context</p>
+      </div>
+
+      <div className="flex flex-col items-center p-0 w-full h-[24px] flex-none order-none self-center grow-0 mt-30">
+        <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#8C8680] text-[20px] flex-none order-none grow-0">
+          Type a Finnish word — we find the moment it is spoken on YouTube
+        </p>  
+      </div> 
+
+      <form onSubmit={onSubmit}>
+        <div className="box-border flex flex-row items-start p-0 w-[720px] h-[65.78px] bg-white border-[1.5px] border-[#DDD8D0] shadow-[0px_1px_3px_rgba(0,0,0,0.04)] rounded flex-none order-none grow-0 mt-7"> 
           <input
             id='query'
             name='query'
@@ -24,10 +33,11 @@ function SearchBox({ onSearch }) {
             placeholder='kirjoita suomalainen sana...'
             onChange={e => setQuery(e.target.value)}
             value={query}
-            className='search-box-input'
+            className='flex-1 py-[17.6px] px-[22.4px] outline-none text-[17px]'
           />
-        </div>
-        <button type='submit' className='search-box-button'>ETSI</button>
+        
+        <button type='submit' className='flex flex-col justify-center items-center px-[25.6px] py-0 w-[101.2px] h-[62.78px] bg-[#EDE9E3] flex-none order-1 self-stretch grow-0 hover:bg-[#DDD8D0] transition-colors cursor-pointer'>ETSI</button> 
+          </div>
       </form>
     </div>
   );

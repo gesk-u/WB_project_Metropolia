@@ -4,12 +4,23 @@ import React from 'react';
 
 function Header() {
   return (
-    <header className="app-header">
-      <div className="app-header-content">
-        <span className="app-header-logo">SANAHAKU</span>
-        <span className="app-header-subtitle">Finnish pronunciation finder</span>
-        <span className="app-header-description">Uses YouTube subtitles to find real pronunciation in context</span>
-      </div>
+    <header className="box-border flex flex-row justify-between items-center
+     py-5 px-8 w-[1325px] h-[73px] bg-[#F4F1EC] border-b border-[#DDD8D0]
+      flex-none order-none self-stretch grow-0">
+        <button className="font-['JetBrains_Mono'] font-normal not-italic text-[15px] leading-[16px] 
+            text-center tracking-[0.88px] uppercase text-[#8C8680] 
+            flex-none order-none grow-0 
+            border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] 
+            transition-colors rounded-sm px-2 py-1">
+            Sanahaku
+        </button>
+        <div className="flex flex-row items-center p-0 gap-3 w-[297px] h-[17px] flex-none order-none grow-0">
+            Finnish pronunciation finder
+        </div>
+        
+
+        
+       
     </header>
   );
 }
