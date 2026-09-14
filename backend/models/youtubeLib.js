@@ -1,6 +1,8 @@
 require('dotenv').config();
 const { google } = require('googleapis');
 const { YoutubeTranscript } = require('youtube-transcript');
+const { WordSearch }  = require("./wordSearchModel")
+
 
 const apiKey = process.env.API_KEY;
 //console.log('API_KEY loaded:', apiKey);
@@ -101,72 +103,71 @@ async function findWordAcrossFinnishVideos(targetWord, searchQuery = null, maxVi
     const query = searchQuery || targetWord;
     const videoIds = await findFinnishVideos(query, maxVideos);
 
-    const results = [];
+    const matchesByVideo = [];
     for (const videoId of videoIds) {
         const hits = await searchWordInVideo(videoId, targetWord);
         if (hits.length > 0) {
-            results.push({ video_id: videoId, matches: hits });
+           matchesByVideo.push({ video_id: videoId, matches: hits });
         }
     }
-    return results;
+
+    return matchesByVideo;
 }
 
-function interleaveByVideo(flat) {
-    const byVideo = new Map();
+const LEAD_IN = 1.5
 
-    for (const row of flat) {
-        if (!byVideo.has(row.videoId)) byVideo.set(row.videoId, []);
-        byVideo.get(row.videoId).push(row)
+const toSeekSec = startSec => Math.max(0, Math.round(startSec - LEAD_IN));
+
+async function findVideo(query, lemma='', page=1, pageSize=100){
+    const q = query.toLowerCase().trim();
+    const l = lemma.toLowerCase().trim();
+    const pageNum = Math.max(1, Number(page) || 1);
+    const pageSizeNum    = Math.max(1, Number(pageSize) || 100);
+
+    let doc = await WordSearch.findOne({query: q, lemma: l});
+
+    if (!doc) {
+        const matchesByVideo = await findWordAcrossFinnishVideos(q)
+        
+        const results = matchesByVideo.flatMap( v =>
+            v.matches.map(m => ({
+                videoId: v.video_id,
+                startSec: m.timestamp,
+                text: m.context
+            }))
+        )
+
+        doc = await WordSearch.findOneAndUpdate(
+            { query: q, lemma: l },
+            { $set: { results, fetchedAt: new Date() } },
+            { upsert: true, new: true },
+        );
+            
     }
 
-    const queues = [...byVideo.values()]
-    const out = []
-    let i = 0
-    while (out.length < flat.length) {
-        const q = queues[i % queues.length]
-        if (q.length) out.push(q.shift())
-        i++
-    }
+            const start = (pageNum - 1) * pageSizeNum;
 
-    return out
-
+            return {
+                query: q,
+                lemma: l,
+                total: doc.results.length,
+                page: pageNum,
+                pageSize:  pageSizeNum,
+                results: doc.results.slice(start, start +  pageSizeNum).map(hit => {
+                    
+                    const seek = toSeekSec(hit.startSec)
+                    return {
+                        videoId: hit.videoId,
+                        startSec: hit.startSec,
+                        text: hit.text,
+                        seekSec: seek,
+                        url: `https://youtube.com/watch?v=${hit.videoId}&t=${seek}s`,
+                    };
+                }),
+            };
 }
 
 
-function buildResponse(targetWord, matchesByVideo, page = 1, pageSize = 100) {
-
-    const flat = matchesByVideo.flatMap( v =>
-        v.matches.map(m => ({
-            videoId: v.video_id,
-            startSec: m.timestamp,
-            text: m.context
-        }))
-    )
-
-    const interleaved = interleaveByVideo(flat);
-
-    const start = (page - 1) * pageSize;
-    const results = interleaved.slice(start, start + pageSize).map(r => {
-        const seek = Math.max(0, Math.floor(r.startSec - 1.5));
-        return {
-            ...r,
-            startSec: Number(r.startSec.toFixed(2)),
-            seekSec: seek,
-            url: `https://youtube.com/watch?v=${r.videoId}&t=${seek}s`,
-        }
-    })
-
-    
-    return {
-        query: targetWord,
-        lemma: "",
-        total: flat.length,
-        page,
-        pageSize,
-        results,  
-    }
-
-}
 
 
 // (async () => {
@@ -174,9 +175,8 @@ function buildResponse(targetWord, matchesByVideo, page = 1, pageSize = 100) {
 //   console.log(JSON.stringify(results, null, 25));
 // })();
 
-buildResponse('koira').then(r => console.log(JSON.stringify(r, null, 2)))
+//buildResponse('koira').then(r => console.log(JSON.stringify(r, null, 2)))
 
 module.exports = {
-    findWordAcrossFinnishVideos,
-    buildResponse
+    findVideo
 }
