@@ -1,13 +1,16 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 // will add styling later. 
 //import './SearchBox.css';  
 
 function SearchBox({ onSearch }) {
     const [query, setQuery] = useState('');
+    const navigateToResults = useNavigate();   // TO NAVIGATE TO RESULTS PAGE WHEN CLICK "ETSI"
 
     const onSubmit = e => {
         e.preventDefault();
         onSearch(query);
+        navigateToResults('/results');  // TO NAVIGATE TO RESULTS PAGE WHEN CLICK "ETSI" 
     };
 
     return (
