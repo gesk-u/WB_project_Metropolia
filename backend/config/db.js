@@ -1,16 +1,13 @@
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
-    try {
-    const conn = await mongoose.connect("mongodb://localhost:27017/sanahaku")
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        if ((error.name) === 'ValidationError') {
-            resizeBy.status(400).json({ message: "Invalid input", error: error.message })
-        } else {
-            res.status(500).json({message: "Failed to create car", error: error.message})
-        }
-    }
-}
+  } catch (error) {
+    console.error(`MongoDB connection error: ${error.message}`);
+    process.exit(1);
+  }
+};
 
 module.exports = connectDB;

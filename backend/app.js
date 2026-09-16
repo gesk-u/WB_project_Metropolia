@@ -1,3 +1,4 @@
+require('dotenv').config();
 const connectDB = require('./config/db');
 const express = require('express');
 const searchRouter = require('./routes/searchRoutes.js');
