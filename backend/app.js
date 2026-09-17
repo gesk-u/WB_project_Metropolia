@@ -1,15 +1,19 @@
-require('dotenv').config();
-const connectDB = require('./config/db');
-const express = require('express');
-const searchRouter = require('./routes/searchRoutes.js');
+require('dotenv').config()
 
-const app = express();
+const connectDB = require('./config/db')
+const express = require('express')
 
-connectDB();
+const searchRouter = require('./routes/searchRoutes.js')
+const authRouter = require('./routes/authRoutes.js')
 
-app.use(express.json());
+const app = express()
 
-app.use('/api/search', searchRouter);
+connectDB()
+
+app.use(express.json())
+
+app.use('/api/search', searchRouter)
+app.use('/api/auth', authRouter)
 
 app.use((req, res) => {
   console.log('no match:', req.method, req.originalUrl);
