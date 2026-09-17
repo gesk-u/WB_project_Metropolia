@@ -3,7 +3,7 @@ require('dotenv').config()
 const connectDB = require('./config/db')
 const express = require('express')
 
-const searchRouter = require('/routes/searchRoutes.js')
+const searchRouter = require('./routes/searchRoutes.js')
 const authRouter = require('./routes/authRoutes.js')
 
 const app = express()
