@@ -11,7 +11,7 @@ const register = async (req, res) => {
 
         const { name, password } = req.body
 
-        if (!email || !password) {
+        if (!name || !password) {
             return res.status(400).json({ error: 'both username and password are required'})
         }
 
@@ -31,7 +31,8 @@ const register = async (req, res) => {
         res.status(201).json({ id: user.id, name: user.name })
 
     } catch (error) {
-        logError(error)
+        console.error(error.message)
+        res.status(500).json({ error: 'something went wrong' })
     }
 }
 
@@ -42,7 +43,7 @@ const login = async (req, res) => {
 
         const { name, password } = req.body
 
-        if (!email || !password) {
+        if (!name || !password) {
             return res.status(400).json({ error: 'both username and password are required'})
         }
 
@@ -62,13 +63,9 @@ const login = async (req, res) => {
         res.status(200).json({ token, user: { id: user.id, name: user.name }})
 
     } catch (error) {
-        logError(error)
+        console.error(error.message)
+        res.status(500).json({ error: 'something went wrong' })
     }
-}
-
-const logError = (error) => {
-    console.error(error.message)
-    res.status(500).json({ error: 'something went wrong' })
 }
 
 module.exports = { register, login }
