@@ -1,5 +1,6 @@
 require('dotenv').config();
 const connectDB = require('./config/db');
+const aiRouter = require('./routes/aiRoutes')
 const express = require('express');
 const searchRouter = require('./routes/searchRoutes.js');
 
@@ -10,6 +11,7 @@ connectDB();
 app.use(express.json());
 
 app.use('/api/search', searchRouter);
+app.use('/api/ai', aiRouter);
 
 app.use((req, res) => {
   console.log('no match:', req.method, req.originalUrl);
