@@ -20,7 +20,7 @@ function SearchBox({ onSearch }) {
       </div>
 
       <div className="flex flex-col items-center p-0 w-full h-[24px] flex-none order-none self-center grow-0">
-        <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#8C8680] text-[20px] flex-none order-none grow-0">
+        <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#5A5550] text-[20px] flex-none order-none grow-0">
           Type a Finnish word — we find the moment it is spoken on YouTube
         </p>   
       </div> 
@@ -33,6 +33,7 @@ function SearchBox({ onSearch }) {
             type='text'
             placeholder='kirjoita suomalainen sana...'
             onChange={e => setQuery(e.target.value)}
+            required
             value={query}
             className='flex-1 py-[17.6px] px-[22.4px] outline-none text-[17px]'
           />

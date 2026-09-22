@@ -22,7 +22,6 @@ function App() {
               <>  
               <SearchBox onSearch={handleSearch} /> 
               <SuggestionWords
-                words={['kiitos', 'talvi', 'koira']}
                 onWordClick={handleSearch}/>
               </>
               }

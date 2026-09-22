@@ -10,13 +10,9 @@ function Results() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [videoData, setVideoData] = useState({ results: [] }); 
     const [loading, setLoading] = useState(true);   // to show loading message while fetching data from API
- 
-    const handleSearch = (word) => {
-    console.log('Searching for:', word);
-  }; 
 
     useEffect(() => {
-        const fetchVideos = async () => {
+        const fetchVideos = async () => { 
             console.log('WORD', word);
             // setLoading(true);
             // if (loading) return <p>Loading...</p>;
@@ -63,10 +59,7 @@ function Results() {
     if (loading) return <p>Loading...</p>;
     if (videoData.results.length === 0) return <p>No results found for "{word}"</p>;
     return ( 
-        <div className="flex flex-col items-center p-0 w-[720px] flex-none
-            order-1 self-center grow-0 shadow-lg"> {/* shadow-lg -for my visibility. */}
-            
-            <p> Results for {word} {videoData.results.length}</p>
+        <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0">
             
             <VideoListBox
             currentIndex = {currentIndex}
@@ -77,7 +70,7 @@ function Results() {
             <VideoBox currentVideo = {videoData.results[currentIndex]}/>
             <VideoInfoBox currentVideo = {videoData.results[currentIndex]} word={word}/>
             <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#8C8680] text-[20px] flex-none order-none grow-0">Search for the next phrase:</p>
-            <SearchBox onSearch={handleSearch}/>
+            {/* <SearchBox onSearch={handleSearch}/> */}
         </div>
     )
 } 
