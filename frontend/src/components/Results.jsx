@@ -1,30 +1,49 @@
 import { VideoBox, VideoListBox, VideoInfoBox } from './VideoBox.jsx';
-import React, { useState } from 'react';
-import {videoData} from './videoData.js'; //hardcoded videolist.
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import SearchBox from './SearchBox.jsx';
 
-
-
-
-//   query: "koira",
-//   lemma: "",
-//   total: 48,
-//   page: 1,
-//   pageSize: 100,
-//   results: [
-//     {
-//       videoId: "d8F7SJqH79g",
-//       startSec: 16.28,
-//       text: "Pääseekö koira tän teipin läpi No pääset",
-//       seekSec: 14,
-//       url: "https://youtube.com/watch?v=d8F7SJqH79g&t=14s"
-//     },
 
 function Results() {
-// resives api data and gives to its children:
-    // VideoListBox - position/count
-    //VideoBox - current video data.
+// resives api data and gives to its children: VideoListBox - position/count, VideoBox - current video data.
+    const { word } = useParams();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [videoData, setVideoData] = useState({ results: [] }); 
+    const [loading, setLoading] = useState(true);   // to show loading message while fetching data from API
  
+    const handleSearch = (word) => {
+    console.log('Searching for:', word);
+  }; 
+
+    useEffect(() => {
+        const fetchVideos = async () => {
+            console.log('WORD', word);
+            // setLoading(true);
+            // if (loading) return <p>Loading...</p>;
+            try {
+                const responce = await fetch(`http://localhost:4000/api/search?word=${word}`, {
+                    method: 'POST',
+                });
+                
+                if (!responce.ok) throw new Error("Could not fetch vidoes from API");
+                const data = await responce.json();
+
+                const filteredVideos = data.results.filter((item, index, self) =>
+                index === self.findIndex(v => v.videoId === item.videoId)
+                );
+
+
+                setVideoData({ ...data, results: filteredVideos });
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching videos:", error);
+                setLoading(false);
+            };
+        };
+        fetchVideos();
+    }, [word]);
+
+    
     //finctions to navigate through the video list <= or =>:
     const clickPrev = () => {
         if (currentIndex > 0) {
@@ -38,13 +57,17 @@ function Results() {
         }
     } 
 
-    console.log(videoData.results.length);
+    console.log(videoData.results);
     console.log(videoData.results[currentIndex]);
-
+    // if (loading) return <p>Loading...</p>;
+    if (loading) return <p>Loading...</p>;
+    if (videoData.results.length === 0) return <p>No results found for "{word}"</p>;
     return ( 
         <div className="flex flex-col items-center p-0 w-[720px] flex-none
             order-1 self-center grow-0 shadow-lg"> {/* shadow-lg -for my visibility. */}
-            <p>I am the results container</p>
+            
+            <p> Results for {word} {videoData.results.length}</p>
+            
             <VideoListBox
             currentIndex = {currentIndex}
             totalVideos = {videoData.results.length}
@@ -52,7 +75,9 @@ function Results() {
             clickNext = {clickNext} />
 
             <VideoBox currentVideo = {videoData.results[currentIndex]}/>
-            <VideoInfoBox currentVideo = {videoData.results[currentIndex]}/>
+            <VideoInfoBox currentVideo = {videoData.results[currentIndex]} word={word}/>
+            <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#8C8680] text-[20px] flex-none order-none grow-0">Search for the next phrase:</p>
+            <SearchBox onSearch={handleSearch}/>
         </div>
     )
 } 

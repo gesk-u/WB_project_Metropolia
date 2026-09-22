@@ -1,34 +1,32 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-// will add styling later. 
-//import './SearchBox.css';  
+import { useNavigate } from 'react-router-dom'; 
 
 function SearchBox({ onSearch }) {
     const [query, setQuery] = useState('');
-    const navigateToResults = useNavigate();   // TO NAVIGATE TO RESULTS PAGE WHEN CLICK "ETSI"
+    const navigate= useNavigate();   // TO NAVIGATE TO RESULTS PAGE WHEN CLICK "ETSI"
 
     const onSubmit = e => {
         e.preventDefault();
         onSearch(query);
-        navigateToResults('/results');  // TO NAVIGATE TO RESULTS PAGE WHEN CLICK "ETSI" 
-    };
+        console.log('Searching for:', query);
+        navigate(`/WB_project_Metropolia/results/${query}`);
+      }; 
 
     return (
       
-      <div className="flex flex-col items-center p-6 py-10 w-[720px] max-w-[768px]  mx-auto flex-none order-none grow-0">
+      <div className="flex flex-col items-center p-6 py- w-[720px] max-w-[768px]  mx-auto flex-none order-none grow-0">
         <div className="flex flex-col items-center pb-8 w-full h-[49px] flex-none order-0 grow-0">
-            <p className=" h-[17px] font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] text-center tracking-[0.66px] text-[#C4BFB8] flex-none order-none grow-0">
-            Uses YouTube subtitles to find real pronunciation in context</p>
+
       </div>
 
-      <div className="flex flex-col items-center p-0 w-full h-[24px] flex-none order-none self-center grow-0 mt-30">
+      <div className="flex flex-col items-center p-0 w-full h-[24px] flex-none order-none self-center grow-0">
         <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#8C8680] text-[20px] flex-none order-none grow-0">
           Type a Finnish word — we find the moment it is spoken on YouTube
-        </p>  
+        </p>   
       </div> 
 
       <form onSubmit={onSubmit}>
-        <div className="box-border flex flex-row items-start p-0 w-[720px] h-[65.78px] bg-white border-[1.5px] border-[#DDD8D0] shadow-[0px_1px_3px_rgba(0,0,0,0.04)] rounded flex-none order-none grow-0 mt-7"> 
+        <div className="box-border flex flex-row items-start p-0 w-[720px] h-[65.78px] bg-white border-[1.5px] border-[#DDD8D0] shadow-[0px_1px_3px_rgba(0,0,0,0.04)] rounded flex-none order-none grow-0 mt-5"> 
           <input
             id='query'
             name='query'

@@ -18,7 +18,7 @@ function App() {
     <main className="flex flex-col items-center p-0 w-full min-h-screen bg-[#F4F1EC] flex-none order-none self-center grow-0">
       <Header />
         <Routes>
-            <Route path="/" element={
+            <Route path="/WB_project_Metropolia/" element={
               <>  
               <SearchBox onSearch={handleSearch} /> 
               <SuggestionWords
@@ -27,7 +27,7 @@ function App() {
               </>
               }
             />
-            <Route path="/results" element={<Results />} /> 
+            <Route path="/WB_project_Metropolia/results/:word" element={<Results />} /> 
         </Routes>    
       </main>
     </Router>
