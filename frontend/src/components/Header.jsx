@@ -4,8 +4,8 @@ function Header() {
   return (
     <>
       <header className="box-border flex flex-row justify-start items-center
-       py-5 px-8 w-[1325px] h-[73px] bg-[#F4F1EC] border-b border-[#DDD8D0]
-        flex-none order-none self-stretch grow-0">
+       py-5 px-8 w-full h-[73px] bg-[#F4F1EC] border-b border-[#DDD8D0]
+        flex-none">
           <nav className="flex flex-row items-center gap-3">
               <Link to="/WB_project_Metropolia/">
                   <button className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16px] 
