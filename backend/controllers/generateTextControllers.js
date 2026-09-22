@@ -7,7 +7,7 @@ const cleanWord = (raw) => {
   if (typeof raw !== 'string') return null;
   const word = raw.trim().toLowerCase();
   if (!word || word.length > 50) return null;
-  if (!/^[a-z][a-z'\- ]*$/i.test(word)) return null;
+  if (!/^[a-zåäö][a-zåäö'\- ]*$/i.test(word)) return null;
   return word;
 };
 
