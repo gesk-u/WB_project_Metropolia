@@ -2,6 +2,8 @@ import { VideoBox, VideoListBox, VideoInfoBox } from './VideoBox.jsx';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import SearchBox from './SearchBox.jsx';
+import AiButton from './AiButton.jsx'; 
+import AiPage from '../pages/AiPage';
 
 
 function Results() {
@@ -10,6 +12,7 @@ function Results() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [videoData, setVideoData] = useState({ results: [] }); 
     const [loading, setLoading] = useState(true);   // to show loading message while fetching data from API
+    const [aiResults, setAiResults] = useState(false);
 
     useEffect(() => {
         const fetchVideos = async () => { 
@@ -39,6 +42,11 @@ function Results() {
         fetchVideos();
     }, [word]);
 
+    // Handle AI results button
+    const handleAiResultsClick = () => {
+        setAiResults((prevAiResults) => !prevAiResults)
+    }
+
     
     //finctions to navigate through the video list <= or =>:
     const clickPrev = () => {
@@ -57,7 +65,15 @@ function Results() {
     console.log(videoData.results[currentIndex]);
     // if (loading) return <p>Loading...</p>;
     if (loading) return <p>Loading...</p>;
-    if (videoData.results.length === 0) return <p>No results found for "{word}"</p>;
+    if (videoData.results.length === 0) {
+        setAiResults(true)
+        return (
+            <>
+                <p>No results found for "{word}"</p>
+                <AiButton results={aiResults}/>
+            </>
+        
+    )}
     return ( 
         <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0">
             
@@ -71,6 +87,8 @@ function Results() {
             <VideoInfoBox currentVideo = {videoData.results[currentIndex]} word={word}/>
             <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#8C8680] text-[20px] flex-none order-none grow-0">Search for the next phrase:</p>
             {/* <SearchBox onSearch={handleSearch}/> */}
+            <AiButton handler={handleAiResultsClick}/>
+            {aiResults && <AiPage word={word}/> }
         </div>
     )
 } 

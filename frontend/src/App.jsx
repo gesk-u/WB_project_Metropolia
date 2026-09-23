@@ -4,6 +4,7 @@ import Header from './components/Header';
 import SuggestionWords from './components/SuggestionWords';
 import {BrowserRouter as Router, Route, Routes, Link, NavLink} from 'react-router-dom';
 import Results from './components/Results';
+import AiPage from './pages/AiPage';
 
 function App() {
   // API called when the user submits a search query
@@ -19,7 +20,8 @@ function App() {
       <Header />
         <Routes>
             <Route path="/WB_project_Metropolia/" element={
-              <>  
+              <>
+
               <SearchBox onSearch={handleSearch} /> 
               <SuggestionWords
                 onWordClick={handleSearch}/>
