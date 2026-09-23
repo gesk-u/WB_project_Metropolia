@@ -14,7 +14,7 @@ if (!process.env.GEMINI_API_KEY) {
 
 
 // GoogleGenerativeAI setup
-const MODEL_NAME = "models/gemini-3.1-flash-lite";
+const MODEL_NAME = "models/gemini-3.5-flash-lite";
 
 const model = async (prompt, options = {}) => {
   const contents = [{ role: "user", parts: [{ text: prompt }] }];
