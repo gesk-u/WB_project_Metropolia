@@ -11,8 +11,13 @@ const searchVideos = async (req, res) => {
         const results = await youtubeLib.findVideo(word, lemma, page, pageSize)
         res.status(200).json(results);
     } catch(err) {
-        console.error(err);
-        res.status(500).json({ error: 'search failed' });
+        console.error("Search error:", err);
+        const isQuota = err?.response?.data?.error?.errors?.[0]?.reason === "quotaExceeded"
+            || err?.errors?.[0]?.reason === "quotaExceeded";
+        if (isQuota) {
+            return res.status(503).json({ error: "Video search limit reached for today, try again later." });
+        }
+        res.status(500).json({ error: "search failed" });
     }
 }
 
