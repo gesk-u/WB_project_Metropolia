@@ -6,5 +6,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   base: "/WB_project_Metropolia/",
   plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      "/api": "http://localhost:4000",
+    },
+  },
 }) 
   
