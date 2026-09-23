@@ -12,6 +12,7 @@ const example = {
 
 import { useState, useEffect } from "react";
 import WordData from "../components/WordData.jsx";
+import Loader from '../components/Loader.jsx';
 
 const AiPage = ({ word }) => {
     const [result, setResult] = useState(null);
@@ -21,14 +22,36 @@ const AiPage = ({ word }) => {
     useEffect(() => {
         if (!word) return;
 
+        const cacheKey = `ai:${word.toLowerCase()}`;
+
+        try {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) {
+                setResult(JSON.parse(cached));
+                setError(null);
+                return;
+            }
+        } catch {
+        // storage unavailable or corrupt data: just fetch normally
+        }
+
         const fetchWord = async() => {
             setIsPending(true);
             setError(null)
             try {
-                const response = await fetch(`/api/ai?word=${encodeURIComponent(word)}`);
+                const response = await fetch(`/api/ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json"},
+                    body: JSON.stringify({ word }) 
+                });
                 if (!response.ok) throw new Error("Could not fetch ai response");
                 const data = await response.json();
                 setResult(data);
+                try {
+                    sessionStorage.setItem(cacheKey, JSON.stringify(data));
+                } catch {
+                // storage full or blocked: not critical
+                }
                 //setWord(example);
             } catch (e) {
                 setError(e.message);
@@ -47,7 +70,7 @@ const AiPage = ({ word }) => {
                 </div>
             )}
             {isPending && (
-                <div className="py-6 text-center text-sm italic text-stone-400">Loading…</div>
+                <Loader word={word} />
             )}
             {result && <WordData word={result} />}
         </div>
