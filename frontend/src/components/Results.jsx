@@ -2,9 +2,10 @@ import { VideoBox, VideoListBox, VideoInfoBox } from './VideoBox.jsx';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import SearchBox from './SearchBox.jsx';
+import NoResults from './NoResults.jsx';
 
 
-function Results() {
+function Results({ onSearch }) {
 // resives api data and gives to its children: VideoListBox - position/count, VideoBox - current video data.
     const { word } = useParams();
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -14,8 +15,7 @@ function Results() {
     useEffect(() => {
         const fetchVideos = async () => { 
             console.log('WORD', word);
-            // setLoading(true);
-            // if (loading) return <p>Loading...</p>;
+            setLoading(true);
             try {
                 const responce = await fetch(`http://localhost:4000/api/search?word=${word}`, {
                     method: 'POST',
@@ -33,6 +33,7 @@ function Results() {
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching videos:", error);
+                setVideoData({ results: [] });
                 setLoading(false);
             };
         };
@@ -53,25 +54,34 @@ function Results() {
         }
     } 
 
-    console.log(videoData.results);
-    console.log(videoData.results[currentIndex]);
-    // if (loading) return <p>Loading...</p>;
-    if (loading) return <p>Loading...</p>;
-    if (videoData.results.length === 0) return <p>No results found for "{word}"</p>;
-    return ( 
-        <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0">
-            
-            <VideoListBox
-            currentIndex = {currentIndex}
-            totalVideos = {videoData.results.length}
-            clickPrev = {clickPrev}
-            clickNext = {clickNext} />
 
-            <VideoBox currentVideo = {videoData.results[currentIndex]}/>
-            <VideoInfoBox currentVideo = {videoData.results[currentIndex]} word={word}/>
-            <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#8C8680] text-[20px] flex-none order-none grow-0">Search for the next phrase:</p>
-            {/* <SearchBox onSearch={handleSearch}/> */}
-        </div>
+    return ( 
+        <>
+        {/* searching in process: */}
+        {loading && (<p>Loading...</p>)} 
+
+        {/* search returns empty list: */}
+        {!loading && videoData.results.length === 0 && (
+            <NoResults word={word} onSearch={onSearch} />
+            )}
+        
+        {/* search returns video: */}
+        {!loading && videoData.results.length > 0 && (
+            <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0">
+                <VideoListBox
+                    currentIndex = {currentIndex}
+                    totalVideos = {videoData.results.length}
+                    clickPrev = {clickPrev}
+                    clickNext = {clickNext} />
+
+                <VideoBox currentVideo = {videoData.results[currentIndex]}/>
+                <VideoInfoBox currentVideo = {videoData.results[currentIndex]} word={word}/>
+                <p className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] tracking-[0.88px] uppercase text-[#5A5550] self-stretch mt-8">
+                    Search for the next word or phrase:</p>
+                <SearchBox onSearch={onSearch}/> 
+            </div> 
+        )}
+        </>
     )
 } 
 

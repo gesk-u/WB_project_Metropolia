@@ -10,23 +10,17 @@ function SearchBox({ onSearch }) {
         onSearch(query);
         console.log('Searching for:', query);
         navigate(`/WB_project_Metropolia/results/${query}`);
-      }; 
+      };  
 
     return (
       
-      <div className="flex flex-col items-center p-6 py- w-[720px] max-w-[768px]  mx-auto flex-none order-none grow-0">
+      <div className="flex flex-col items-center w-[720px] max-w-[768px]  mx-auto flex-none order-none grow-0">
         <div className="flex flex-col items-center pb-8 w-full h-[49px] flex-none order-0 grow-0">
 
-      </div>
-
-      <div className="flex flex-col items-center p-0 w-full h-[24px] flex-none order-none self-center grow-0">
-        <p className="w-full h-[24px] font-['Outfit'] font-light not-italic text-base leading-[24px] text-center text-[#5A5550] text-[20px] flex-none order-none grow-0">
-          Type a Finnish word — we find the moment it is spoken on YouTube
-        </p>   
       </div> 
 
       <form onSubmit={onSubmit}>
-        <div className="box-border flex flex-row items-start p-0 w-[720px] h-[65.78px] bg-white border-[1.5px] border-[#DDD8D0] shadow-[0px_1px_3px_rgba(0,0,0,0.04)] rounded flex-none order-none grow-0 mt-5"> 
+        <div className="box-border flex flex-row items-start p-0 w-[720px] h-[65.78px] bg-white border-[1.5px] border-[#DDD8D0] shadow-[0px_1px_3px_rgba(0,0,0,0.04)] rounded flex-none order-none grow-0"> 
           <input
             id='query'
             name='query'

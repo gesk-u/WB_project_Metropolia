@@ -24,12 +24,12 @@ function Header() {
               {/* RIGHT: Sign Up + Login */}
               <div className="flex flex-row items-center gap-2 mr-55">
                   <Link to="/WB_project_Metropolia/signup">
-                      <button className="font-['JetBrains_Mono'] font-normal not-italic text-[18px] leading-[16px] text-center tracking-[0.88px] uppercase text-[#5A5550] flex-none order-none grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-2 py-1">
+                      <button className="font-['JetBrains_Mono'] font-normal not-italic text-[15px] leading-[16px] text-center tracking-[0.88px] uppercase text-[#5A5550] flex-none order-none grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-2 py-1">
                           Sign Up
                       </button>
                   </Link>
                   <Link to="/WB_project_Metropolia/login">
-                      <button className="font-['JetBrains_Mono'] font-normal not-italic text-[18px] leading-[16px] text-center tracking-[0.88px] uppercase text-[#5A5550] flex-none order-none grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-2 py-1">
+                      <button className="font-['JetBrains_Mono'] font-normal not-italic text-[15px] leading-[16px] text-center tracking-[0.88px] uppercase text-[#5A5550] flex-none order-none grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-2 py-1">
                           Login
                       </button>
                   </Link>
@@ -38,9 +38,6 @@ function Header() {
           </nav> 
       </header>
 
-      {/* <p className="h-[17px] font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] text-center tracking-[0.66px] text-[#C4BFB8] w-full py-6">
-        Uses YouTube subtitles to find real pronunciation in context
-      </p> */}
     </>
   );
 }
