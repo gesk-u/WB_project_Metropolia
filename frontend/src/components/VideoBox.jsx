@@ -7,7 +7,7 @@ function VideoListBox({ currentIndex, totalVideos, clickPrev, clickNext}) {
     // RECIVES: 1-current position, 2- total amount of videos
 
     return (
-        <div className="flex flex-row justify-between items-center p-0 w-[720px] h-9 flex-none order-none self-center grow-0">
+        <div className="flex flex-row justify-between items-center p-0 w-[720px] h-9 flex-none order-none self-center grow-0 mt-2">
 
             <p className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] tracking-[0.88px] uppercase text-[#5A5550]">
                 video {currentIndex+1} of {totalVideos}</p>

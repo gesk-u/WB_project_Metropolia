@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@theme {
+  --animate-wave: wave 1.4s ease-in-out infinite;
+  --animate-scan: scan 1.6s ease-in-out infinite;
+
+  @keyframes wave {
+    0%, 60%, 100% { transform: translateY(0); color: #5A5550; }
+    30% { transform: translateY(-10px); color: #7c9a8c; }
+  }
+
+  @keyframes scan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(300%); }
+  }
+}
