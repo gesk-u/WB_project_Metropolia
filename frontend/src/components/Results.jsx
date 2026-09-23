@@ -87,7 +87,7 @@ function Results({ onSearch }) {
         
         {/* search returns video: */}
         {hasResults && (
-            <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0 mb-35">
+            <div className="flex flex-col items-center p-0 w-180 flex-none order-1 self-center grow-0 mb-35">
                 <VideoListBox 
                     currentIndex = {currentIndex}
                     totalVideos = {videoData.results.length}

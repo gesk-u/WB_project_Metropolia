@@ -1,15 +1,3 @@
-const example = {
-  "word": "kissa",
-  "transcription": "/ˈkisːɑ/",
-  "definition": "A cat. A small furry animal that many people keep as a pet at home.",
-  "sentences": [
-    "Minulla on kissa.",
-    "Kissa nukkuu sohvalla.",
-    "Naapurin kissa on hyvin ystävällinen."
-  ]
-}
-
-
 import { useState, useEffect } from "react";
 import WordData from "../components/WordData.jsx";
 import Loader from '../components/Loader.jsx';
@@ -52,7 +40,6 @@ const AiPage = ({ word }) => {
                 } catch {
                 // storage full or blocked: not critical
                 }
-                //setWord(example);
             } catch (e) {
                 setError(e.message);
             } finally {
@@ -63,7 +50,7 @@ const AiPage = ({ word }) => {
     }, [word]);
 
     return (
-        <div className="mx-auto mt-4 w-full max-w-[720px] font-serif">
+        <div className="mx-auto mt-4 w-full max-w-180 font-serif">
             {error && (
                 <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {error}
