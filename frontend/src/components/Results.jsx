@@ -2,7 +2,11 @@ import { VideoBox, VideoListBox, VideoInfoBox } from './VideoBox.jsx';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import SearchBox from './SearchBox.jsx';
+import AiButton from './AiButton.jsx'; 
+import AiPage from '../pages/AiPage';
 import NoResults from './NoResults.jsx';
+import Loader from './Loader.jsx';
+
 
 
 function Results({ onSearch }) {
@@ -11,6 +15,7 @@ function Results({ onSearch }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [videoData, setVideoData] = useState({ results: [] }); 
     const [loading, setLoading] = useState(true);   // to show loading message while fetching data from API
+    const [aiResults, setAiResults] = useState(false);
 
     useEffect(() => {
         const fetchVideos = async () => { 
@@ -21,7 +26,10 @@ function Results({ onSearch }) {
                     method: 'POST',
                 });
                 
-                if (!responce.ok) throw new Error("Could not fetch vidoes from API");
+                if (!response.ok) {
+                    const body = await response.json().catch(() => ({}));
+                    throw new Error(body.error || "Could not fetch videos");
+                }
                 const data = await responce.json();
 
                 const filteredVideos = data.results.filter((item, index, self) =>
@@ -40,6 +48,15 @@ function Results({ onSearch }) {
         fetchVideos();
     }, [word]);
 
+    useEffect(() => {
+        setAiResults(false);
+    }, [word]);
+
+    // Handle AI results button
+    const handleAiResultsClick = () => {
+        setAiResults((prevAiResults) => !prevAiResults)
+    }
+
     
     //finctions to navigate through the video list <= or =>:
     const clickPrev = () => {
@@ -54,20 +71,26 @@ function Results({ onSearch }) {
         }
     } 
 
+    const noResults = !loading && videoData.results.length === 0;
+    const hasResults = !loading && videoData.results.length > 0;
+    const showAi = aiResults || noResults;
 
     return ( 
         <>
         {/* searching in process: */}
-        {loading && (<p>Loading...</p>)} 
+        {loading && <Loader word={word} />}
 
         {/* search returns empty list: */}
-        {!loading && videoData.results.length === 0 && (
+        {noResults && (
+            <>
             <NoResults word={word} onSearch={onSearch} />
-            )}
+            {showAi && <AiPage word={word} />}      
+            </>
+        )}
         
         {/* search returns video: */}
-        {!loading && videoData.results.length > 0 && (
-            <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0 mb-35">
+        {hasResults && (
+            <div className="flex flex-col items-center p-0 w-180 flex-none order-1 self-center grow-0 mb-35">
                 <VideoListBox 
                     currentIndex = {currentIndex}
                     totalVideos = {videoData.results.length}
@@ -79,6 +102,8 @@ function Results({ onSearch }) {
                 <p className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] tracking-[0.88px] uppercase text-[#5A5550] self-stretch mt-8 p-1">
                     Search for the next word or phrase:</p>
                 <SearchBox onSearch={onSearch}/> 
+                <AiButton handler={handleAiResultsClick}/>
+                {aiResults && <AiPage word={word}/> }
             </div> 
         )}
         </>

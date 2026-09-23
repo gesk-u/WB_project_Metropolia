@@ -17,12 +17,13 @@ function App() {
     <div>
     <Router>
     
-    <main className="flex flex-col items-center p-0 w-full min-h-screen bg-[#F4F1EC] flex-none order-none self-center grow-0">
+    <main className="flex flex-col items-center p-0 w-full min-h-screen bg-[#F4F1EC] flex-none order-0 self-center grow-0">
       <Header/>
         <Routes>
             <Route path="/WB_project_Metropolia/" element={
               <>  
               <TextPage1/>
+
               <SearchBox onSearch={handleSearch} /> 
               <SuggestionWords onWordClick={handleSearch}/>
               </>
