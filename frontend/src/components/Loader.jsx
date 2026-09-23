@@ -1,4 +1,4 @@
-const Loader = ({ word }) => {
+const Loader = ({ word, type}) => {
     const letters = "SANAHAKU".split("");
 
     return (
@@ -21,7 +21,7 @@ const Loader = ({ word }) => {
 
             {word && (
                 <p className="font-serif text-sm italic text-stone-400">
-                    Searching videos for "{word}"…
+                    Searching {type} for "{word}"…
                 </p>
             )}
 

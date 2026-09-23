@@ -63,7 +63,7 @@ const AiPage = ({ word }) => {
                 </div>
             )}
             {isPending && (
-                <Loader word={word} />
+                <Loader word={word} type="" />
             )}
             {result && <WordData word={result} />}
         </div>

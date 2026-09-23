@@ -78,7 +78,7 @@ function Results({ onSearch }) {
     return ( 
         <>
         {/* searching in process: */}
-        {loading && <Loader word={word} />}
+        {loading && <Loader word={word} type="videos" />}
 
         {/* search returns empty list: */}
         {noResults && (
