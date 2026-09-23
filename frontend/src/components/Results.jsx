@@ -67,8 +67,8 @@ function Results({ onSearch }) {
         
         {/* search returns video: */}
         {!loading && videoData.results.length > 0 && (
-            <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0">
-                <VideoListBox
+            <div className="flex flex-col items-center p-0 w-[720px] flex-none order-1 self-center grow-0 mb-35">
+                <VideoListBox 
                     currentIndex = {currentIndex}
                     totalVideos = {videoData.results.length}
                     clickPrev = {clickPrev}
@@ -76,7 +76,7 @@ function Results({ onSearch }) {
 
                 <VideoBox currentVideo = {videoData.results[currentIndex]}/>
                 <VideoInfoBox currentVideo = {videoData.results[currentIndex]} word={word}/>
-                <p className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] tracking-[0.88px] uppercase text-[#5A5550] self-stretch mt-8">
+                <p className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] tracking-[0.88px] uppercase text-[#5A5550] self-stretch mt-8 p-1">
                     Search for the next word or phrase:</p>
                 <SearchBox onSearch={onSearch}/> 
             </div> 
