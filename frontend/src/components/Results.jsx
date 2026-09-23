@@ -26,7 +26,10 @@ function Results({ onSearch }) {
                     method: 'POST',
                 });
                 
-                if (!responce.ok) throw new Error("Could not fetch vidoes from API");
+                if (!response.ok) {
+                    const body = await response.json().catch(() => ({}));
+                    throw new Error(body.error || "Could not fetch videos");
+                }
                 const data = await responce.json();
 
                 const filteredVideos = data.results.filter((item, index, self) =>

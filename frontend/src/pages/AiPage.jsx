@@ -10,6 +10,7 @@ const AiPage = ({ word }) => {
     useEffect(() => {
         if (!word) return;
 
+        const controller = new AbortController();
         const cacheKey = `ai:${word.toLowerCase()}`;
 
         try {
@@ -25,14 +26,17 @@ const AiPage = ({ word }) => {
 
         const fetchWord = async() => {
             setIsPending(true);
-            setError(null)
+            setError(null);
+            setResult(null);
+
             try {
                 const response = await fetch(`/api/ai`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json"},
-                    body: JSON.stringify({ word }) 
+                    body: JSON.stringify({ word }),
+                    signal: controller.signal,
                 });
-                if (!response.ok) throw new Error("Could not fetch ai response");
+                if (!response.ok) throw new Error(`Could not fetch AI response (${response.status})`);
                 const data = await response.json();
                 setResult(data);
                 try {
@@ -41,12 +45,14 @@ const AiPage = ({ word }) => {
                 // storage full or blocked: not critical
                 }
             } catch (e) {
+                if (e.name === "AbortError") return;
                 setError(e.message);
             } finally {
-                setIsPending(false); 
+                if (!controller.signal.aborted) setIsPending(false);
             }
     };
     fetchWord();
+    return () => controller.abort(); 
     }, [word]);
 
     return (
