@@ -1,4 +1,7 @@
-import { VideoBox, VideoListBox, VideoInfoBox } from './VideoBox.jsx';
+// import { VideoBox, VideoListBox, VideoInfoBox } from './VideoBox.jsx';
+import VideoBox from './VideoBox.jsx'; 
+import VideoListBox from './VideoListBox.jsx';
+import VideoInfoBox from './VideoInfoBox.jsx';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import SearchBox from './SearchBox.jsx';
@@ -27,7 +30,7 @@ function Results({ onSearch }) {
                 });
                 
                 if (!responce.ok) {
-                    const body = await response.json().catch(() => ({}));
+                    const body = await responce.json().catch(() => ({}));
                     throw new Error(body.error || "Could not fetch videos");
                 }
                 const data = await responce.json();
@@ -35,7 +38,6 @@ function Results({ onSearch }) {
                 const filteredVideos = data.results.filter((item, index, self) =>
                 index === self.findIndex(v => v.videoId === item.videoId)
                 );
-
 
                 setVideoData({ ...data, results: filteredVideos });
                 setLoading(false);
@@ -50,6 +52,7 @@ function Results({ onSearch }) {
 
     useEffect(() => {
         setAiResults(false);
+        setCurrentIndex(0);
     }, [word]);
 
     // Handle AI results button

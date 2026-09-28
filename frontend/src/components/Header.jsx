@@ -63,16 +63,6 @@ function Header({isAuthenticated, setIsAuthenticated}) {
               )}
             </div>
 
-            <div className="justify-self-end">
-                {isResultsPage && (
-                    <Link to="/WB_project_Metropolia/ai">
-                    <button className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-4 text-center tracking-[0.88px] uppercase text-[#5A5550] bg-[#EDE9E3] border border-[#DDD8D0] hover:bg-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-8 py-2 ">
-                        <p>AI practice</p>
-                    </button>
-                    </Link>
-                )}
-            </div>
-
           </nav> 
       </header>
 
