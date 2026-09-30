@@ -18,8 +18,20 @@
 
 
 
-/* Sana rolling loader */
-.sana-track { --roll-distance: 240px; position: relative; width: 320px; height: 112px; }
+/* Sana rolling loader. Change --s to resize everything at once */
+.sana-track {
+  --s: 1.5;
+  --roll-time: 1.6s;
+  --roll-distance: calc(240px * var(--s));
+  position: relative;
+  width: calc(320px * var(--s));
+  height: calc(112px * var(--s));
+}
+
+/* on phones a 640px track doesn't fit, so use a smaller size there */
+@media (max-width: 700px) {
+  .sana-track { --s: 1.1; }
+}
 
 @keyframes sana-roll {
   from { transform: translateX(0) rotate(0deg); }
@@ -31,17 +43,30 @@
 }
 @keyframes sana-bump {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-5px); }
+  50%      { transform: translateY(calc(-5px * var(--s))); }
 }
 @keyframes sana-blink {
   0%, 20%   { opacity: 0; }
   50%, 100% { opacity: 1; }
 }
 
-.sana-roll   { width: 80px; height: 87px; transform-origin: 50% 62%; animation: sana-roll 1.4s ease-in-out infinite alternate; }
-.sana-shadow { position: absolute; left: 12px; top: 82px; width: 56px; height: 8px; border-radius: 999px;
-               background: rgba(46, 43, 39, 0.15); animation: sana-slide 1.4s ease-in-out infinite alternate; }
-.sana-bump   { position: absolute; left: 0; top: 0; animation: sana-bump 0.35s ease-in-out infinite; }
+.sana-roll {
+  width: calc(80px * var(--s));
+  height: calc(87px * var(--s));
+  transform-origin: 50% 62%;
+  animation: sana-roll var(--roll-time) ease-in-out infinite alternate;
+}
+.sana-shadow {
+  position: absolute;
+  left: calc(12px * var(--s));
+  top: calc(82px * var(--s));
+  width: calc(56px * var(--s));
+  height: calc(8px * var(--s));
+  border-radius: 999px;
+  background: rgba(46, 43, 39, 0.15);
+  animation: sana-slide var(--roll-time) ease-in-out infinite alternate;
+}
+.sana-bump { position: absolute; left: 0; top: 0; animation: sana-bump 0.35s ease-in-out infinite; }
 
 .sana-dots span { animation: sana-blink 1.2s infinite; }
 .sana-dots span:nth-child(2) { animation-delay: 0.2s; }
