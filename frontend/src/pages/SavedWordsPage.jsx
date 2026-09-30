@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSavedWords, removeSavedWord } from '../api/savedWords';
 import EmptySavedWords from '../components/EmptySavedWords'
 import SavedWordsList from '../components/SavedWordsList';
+import Loader from '../components/Loader.jsx';
 
 
 export function SavedWordsPage() {
@@ -43,7 +44,7 @@ export function SavedWordsPage() {
     }   
 
     let content;
-    if (isPending) content = <p className="text-[#6A655D]">Loading...</p>;
+    if (isPending) content = <Loader type="" />;
     else if (error) content = <p role="alert" className="text-[#8F3F1D]">{error}</p>;
     else if (words.length === 0) content = <EmptySavedWords />;
     else content = <SavedWordsList words={words} onRemove={handleRemove} />;
