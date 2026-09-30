@@ -9,6 +9,8 @@ import AiButton from './AiButton.jsx';
 import AiPage from '../pages/AiPage';
 import NoResults from './NoResults.jsx';
 import Loader from './Loader.jsx';
+import SaveButton from './SaveButton.jsx';
+import { getSavedWords, saveWord, removeSavedWord } from '../api/savedWords';
 
 
 
@@ -19,13 +21,15 @@ function Results({ onSearch }) {
     const [videoData, setVideoData] = useState({ results: [] }); 
     const [loading, setLoading] = useState(true);   // to show loading message while fetching data from API
     const [aiResults, setAiResults] = useState(false);
+    const [savedClip, setSavedClip] = useState(null);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         const fetchVideos = async () => { 
             console.log('WORD', word);
             setLoading(true);
             try {
-                const responce = await fetch(`http://localhost:4000/api/search?word=${word}`, {
+                const responce = await fetch(`/api/search?word=${encodeURIComponent(word)}`, {
                     method: 'POST',
                 });
                 
@@ -54,6 +58,48 @@ function Results({ onSearch }) {
         setAiResults(false);
         setCurrentIndex(0);
     }, [word]);
+
+    useEffect(() => {
+        let ignore = false;
+        getSavedWords()
+            .then((list) => {
+                if (!ignore) setSavedClip(list.find((w) => w.word === word.toLowerCase()) ?? null);
+            })
+            .catch(() => {
+                if (!ignore) setSavedClip(null);
+            });
+        return () => { ignore = true; };
+    }, [word]);
+
+    const currentVideo = videoData.results[currentIndex];
+    const isSaved = Boolean(
+        savedClip && currentVideo &&
+        savedClip.videoId === currentVideo.videoId &&
+        savedClip.start === currentVideo.seekSec
+    );
+
+    async function handleSaveClick() {
+        if (!currentVideo || saving) return;
+        setSaving(true);
+        try {
+            if (isSaved) {
+                await removeSavedWord(savedClip._id);
+                setSavedClip(null);
+            } else {
+                const saved = await saveWord({
+                    word,
+                    sentence: currentVideo.text,
+                    videoId: currentVideo.videoId,
+                    start: currentVideo.seekSec,
+                });
+                setSavedClip(saved);
+            }
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            setSaving(false);
+        }
+    }
 
     // Handle AI results button
     const handleAiResultsClick = () => {
@@ -100,8 +146,11 @@ function Results({ onSearch }) {
                     clickPrev = {clickPrev}
                     clickNext = {clickNext} />
 
-                <VideoBox currentVideo = {videoData.results[currentIndex]}/>
-                <VideoInfoBox currentVideo = {videoData.results[currentIndex]} word={word}/>
+                <VideoBox currentVideo={currentVideo} />
+                <div className="mt-4 flex w-full justify-end">
+                    <SaveButton isSaved={isSaved} disabled={saving} onClick={handleSaveClick} />
+                </div>
+                <VideoInfoBox currentVideo={currentVideo} word={word} />
                 <p className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-[16.5px] tracking-[0.88px] uppercase text-[#5A5550] self-stretch mt-8 p-1">
                     Search for the next word or phrase:</p>
                 <SearchBox onSearch={onSearch}/> 

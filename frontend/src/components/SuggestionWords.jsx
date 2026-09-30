@@ -19,7 +19,7 @@ function SuggestionWords() {
     }, []); //shiffling the words to show rundom from the list. 
   
   const handleWordClick = (word) => {
-        navigate(`/WB_project_Metropolia/results/${word}`);
+        navigate(`/results/${word}`);
     };
     return (
     <div className="flex flex-col items-center pt-8 w-[672px] h-[95.19px] flex-none order-2 grow-0">

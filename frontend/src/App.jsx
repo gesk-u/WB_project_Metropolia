@@ -5,6 +5,7 @@ import SuggestionWords from './components/SuggestionWords';
 import {BrowserRouter as Router, Route, Routes, Link, NavLink} from 'react-router-dom';
 import Results from './components/Results';
 import TextPage1 from './components/TextPage1';
+import { SavedWordsPage } from './pages/SavedWordsPage';
 import { useState } from 'react';
 
 function App() {
@@ -15,12 +16,12 @@ function App() {
 
   return (
     <div>
-    <Router>
+    <Router basename="/WB_project_Metropolia">
     
     <main className="flex flex-col items-center p-0 w-full min-h-screen bg-[#F4F1EC] flex-none order-0 self-center grow-0">
       <Header/>
         <Routes>
-            <Route path="/WB_project_Metropolia/" element={
+            <Route path="/" element={
               <>  
               <TextPage1/>
 
@@ -29,13 +30,15 @@ function App() {
               </>
               }
             />
-            <Route path="/WB_project_Metropolia/results/:word" element={
+            <Route path="/results/:word" element={
               <>
               
               <Results onSearch={handleSearch} />
               </>
               }
             />
+
+            <Route path="/saved" element={<SavedWordsPage />} />
         </Routes>
       </main>
     </Router>
