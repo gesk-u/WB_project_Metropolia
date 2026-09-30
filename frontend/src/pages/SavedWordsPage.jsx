@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getSavedWords, removeSavedWord } from '../api/savedWords';
+import EmptySavedWords from '../components/EmptySavedWords'
 import SavedWordsList from '../components/SavedWordsList';
 
 
@@ -41,11 +42,19 @@ export function SavedWordsPage() {
         }
     }   
 
-    if (isPending) return <p>Loading...</p>;
-    if (error) return <p role="alert">{error}</p>;
-    if (words.length === 0) return <p>No words saved yet</p>;
+    let content;
+    if (isPending) content = <p className="text-[#6A655D]">Loading...</p>;
+    else if (error) content = <p role="alert" className="text-[#8F3F1D]">{error}</p>;
+    else if (words.length === 0) content = <EmptySavedWords />;
+    else content = <SavedWordsList words={words} onRemove={handleRemove} />;
 
-    return <SavedWordsList words={words} onRemove={handleRemove} />;
+    return (
+        <div className="mx-auto w-full max-w-[880px] px-4 pb-20 pt-14">
+            <p className="font-['JetBrains_Mono'] text-[13px] uppercase tracking-[0.14em] text-[#6F6A62]">Sanani</p>
+            <h1 className="mt-2 font-['Fraunces'] text-[42px] leading-tight text-[#2E2B27]">Saved words</h1>
+            <div className="mt-7">{content}</div>
+        </div>
+);
     
         
 } 
