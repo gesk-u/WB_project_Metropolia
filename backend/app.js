@@ -4,6 +4,7 @@ const aiRouter = require('./routes/aiRoutes')
 const express = require('express');
 const cors = require('cors');
 const searchRouter = require('./routes/searchRoutes.js');
+const authRouter = require('./routes/authRoutes.js')
 
 const app = express();
 connectDB();
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use('/api/search', searchRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/auth', authRouter)
 
 app.use((req, res) => {
   console.log('no match:', req.method, req.originalUrl);

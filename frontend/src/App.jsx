@@ -7,6 +7,9 @@ import Results from './components/Results';
 import TextPage1 from './components/TextPage1';
 import { useState } from 'react';
 
+import Signup from "./components/Signup"
+import Login from "./components/Login"
+
 function App() {
   // API called when the user submits a search query
   const handleSearch = (query) => {
@@ -34,6 +37,14 @@ function App() {
               
               <Results onSearch={handleSearch} />
               </>
+              }
+            />
+            <Route path="/WB_project_Metropolia/login" element={
+              <Login/>
+              }
+            />
+            <Route path="/WB_project_Metropolia/signup" element={
+              <Signup/>
               }
             />
         </Routes>
