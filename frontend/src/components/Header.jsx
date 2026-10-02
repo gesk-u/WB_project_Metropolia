@@ -1,72 +1,62 @@
-import {BrowserRouter as Router, Route, Routes, Link, useLocation} from 'react-router-dom';
+import { Link, NavLink, useMatch, useNavigate } from 'react-router-dom';
 
+const navBase =
+  "inline-flex min-h-11 items-center rounded-sm border border-transparent px-2 font-['JetBrains_Mono'] text-[17px] uppercase tracking-[0.88px] transition-colors hover:border-[#DDD8D0] hover:text-[#2E2B27]";
+const navItem = `${navBase} text-[#5A5550]`;
+const navLinkClass = ({ isActive }) =>
+  `${navBase} ${isActive ? 'text-[#2E2B27] underline decoration-[#7A9E8E] decoration-2 underline-offset-8' : 'text-[#5A5550]'}`;
 
+function Header({ isAuthenticated, setIsAuthenticated }) {
+  const navigate = useNavigate();
+  const resultsMatch = useMatch('/results/:word'); // null when not on a results page
+  const word = resultsMatch?.params.word;
 
-function Header({isAuthenticated, setIsAuthenticated}) {
-    const location = useLocation();
-    const word = decodeURIComponent(location.pathname.split('/').pop());
-    const isResultsPage = location.pathname.includes('/results/');
-    console.log('Current word:', word);
+  function handleLogout() {
+    // also clear your token / call your logout endpoint here
+    setIsAuthenticated(false);
+    navigate('/');
+  }
 
-    return (
-    <>
-      <header className="box-border flex flex-row justify-start items-center py-5 px-8 w-full h-18.25 bg-[#F4F1EC] border-b border-[#DDD8D0] flex-none">
-          <nav className="grid grid-cols-4 items-center w-full">
+  return (
+    <header className="flex h-18.25 w-full items-center border-b border-[#DDD8D0] bg-[#F4F1EC] px-8">
+      <nav aria-label="Main" className="grid w-full grid-cols-3 items-center">
+        <div className="flex items-center gap-3 justify-self-start">
+          <Link
+            to="/"
+            className="inline-flex min-h-11 items-center rounded-sm border border-transparent px-2 font-['JetBrains_Mono'] text-[20px] uppercase tracking-[0.88px] text-[#7A9E8E] transition-colors hover:border-[#DDD8D0] hover:text-[#2E2B27]"
+          >
+            Sanahaku
+          </Link>
+          <span aria-hidden="true" className="select-none text-xl text-[#DDD8D0]">|</span>
+          {!word && (
+            <span className="font-['JetBrains_Mono'] text-[20px] text-[#5A5550]">Finnish pronunciation finder</span>
+          )}
+        </div>
 
-              <div className="flex flex-row items-center gap-3 justify-self-start">
-                  <Link to="/WB_project_Metropolia/">
-                      <button className="font-['JetBrains_Mono'] font-normal not-italic text-[20px] leading-4 text-center tracking-[0.88px] uppercase text-[#7A9E8E] flex-none order-0 grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-2 py-1">
-                          Sanahaku
-                      </button>
-                  </Link>
-                <span className="text-[#DDD8D0] select-none text-xl">|</span>
-                {!isResultsPage && (
-                    
-                    <div className="flex flex-row items-center p-0 gap-3 h-4.25 flex-none order-0 grow-0 font-['JetBrains_Mono'] font-normal not-italic text-[20px] text-[#5A5550]">
-                        Finnish pronunciation finder
-                    </div>
-                )}
-              </div>
+        <div className="justify-self-center">
+          {word && (
+            <p className="whitespace-nowrap font-['Fraunces'] text-[24px] italic leading-[31.2px] text-[#5A5550]">
+              "{word}"
+            </p>
+          )}
+        </div>
 
-            {isResultsPage && (
-                <div className="flex flex-col items-start p-0 h-8 flex-none order-0 grow-0 justify-self-center">
-                    <p className="font-['Fraunces'] italic font-normal text-[24px] leading-[31.2px] tracking-normal text-[#5A5550] whitespace-nowrap">
-                        "{word}"</p>
-                </div>
-            )}
-
-
-            {!isResultsPage && <div />}
-
-            <div className="flex flex-row items-center gap-2 justify-self-end">
-              {!isAuthenticated && (
-                <>
-                  <Link to="/WB_project_Metropolia/signup">
-                      <button className="font-['JetBrains_Mono'] font-normal not-italic text-[17px] leading-4 text-center tracking-[0.88px] uppercase text-[#5A5550] flex-none order-0 grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-2 py-1">
-                          Sign Up
-                      </button>
-                  </Link>
-                  <Link to="/WB_project_Metropolia/login">
-                      <button className="font-['JetBrains_Mono'] font-normal not-italic text-[17px] leading-4 text-center tracking-[0.88px] uppercase text-[#5A5550] flex-none order-0 grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-1 py-1">
-                          Login
-                      </button>
-                  </Link>
-                </>
-              )}
-
-              {isAuthenticated && (
-                  <>
-                  <span>Welcome</span>
-                  <button onClick={handleClick} className="font-['JetBrains_Mono'] font-normal not-italic text-[17px] leading-4 text-center tracking-[0.88px] uppercase text-[#5A5550] flex-none order-0 grow-0 border border-transparent hover:border-[#DDD8D0] hover:text-[#2E2B27] transition-colors rounded-sm px-3 py-1">
-                      Log out</button>
-                  </>
-              )}
-            </div>
-
-          </nav> 
-      </header>
-
-    </>
+        <div className="flex items-center gap-2 justify-self-end">
+          <NavLink to="/saved" className={navLinkClass}>Saved</NavLink>
+          {isAuthenticated ? (
+            <>
+              <span className="font-['JetBrains_Mono'] text-[17px] text-[#5A5550]">Welcome</span>
+              <button type="button" onClick={handleLogout} className={navItem}>Log out</button>
+            </>
+          ) : (
+            <>
+              <Link to="/signup" className={navItem}>Sign up</Link>
+              <Link to="/login" className={navItem}>Login</Link>
+            </>
+          )}
+        </div>
+      </nav>
+    </header>
   );
 }
 

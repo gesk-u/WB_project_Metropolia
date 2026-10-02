@@ -9,7 +9,7 @@ function SearchBox({ onSearch }) {
         e.preventDefault();
         onSearch(query);
         console.log('Searching for:', query);
-        navigate(`/WB_project_Metropolia/results/${query}`);
+        navigate(`/results/${query}`);
       };  
 
     return (

@@ -1,33 +1,27 @@
-const Loader = ({ word, type}) => {
-    const letters = "SANAHAKU".split("");
+import { SanaHead } from './Logo';
+
+export default function Loader({ word, type = 'videos' }) {
+    const message =
+        type === 'videos'
+            ? `Sana is rolling through YouTube looking for “${word}”`
+            : `Sana does its best...`;
 
     return (
-        <div role="status" className="flex flex-col items-center gap-4 py-16">
-            <div className="flex font-serif text-4xl tracking-[0.3em]" aria-hidden="true">
-                {letters.map((letter, i) => (
-                    <span
-                        key={i}
-                        className="inline-block animate-wave motion-reduce:animate-none"
-                        style={{ animationDelay: `${i * 0.1}s` }}
-                    >
-                        {letter}
-                    </span>
-                ))}
+        <div role="status" aria-live="polite" className="flex flex-col items-center gap-6 px-4 py-16 text-center">
+            <div className="sana-track">
+                <div className="sana-shadow" />
+                <div className="sana-bump">
+                    <div className="sana-roll">
+                        <SanaHead className="h-full w-full" />
+                    </div>
+                </div>
             </div>
-
-            <div className="relative h-0.5 w-48 overflow-hidden rounded-full bg-stone-200">
-                <div className="absolute inset-y-0 w-1/3 rounded-full bg-[#7c9a8c] animate-scan motion-reduce:animate-none" />
-            </div>
-
-            {word && (
-                <p className="font-serif text-sm italic text-stone-400">
-                    Searching {type} for "{word}"…
-                </p>
-            )}
-
-            <span className="sr-only">Loading</span>
+            <p className="font-['Fraunces'] text-xl italic text-[#5A5550]">
+                {message}
+                <span className="sana-dots" aria-hidden="true">
+                    <span>.</span><span>.</span><span>.</span>
+                </span>
+            </p>
         </div>
     );
-};
-
-export default Loader;
+}
