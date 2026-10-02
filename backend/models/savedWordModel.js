@@ -23,6 +23,6 @@ const savedWordSchema = new mongoose.Schema(
 );
 
 // The same user can't save the same clip of the same word twice
-savedWordSchema.index({ user: 1, word: 1, videoId: 1, start: 1 }, { unique: true });
+savedWordSchema.index({ userId: 1, word: 1}, { unique: true });
 
 module.exports = mongoose.model('SavedWord', savedWordSchema);
