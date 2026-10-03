@@ -5,12 +5,16 @@ function SearchBox({ onSearch }) {
     const [query, setQuery] = useState('');
     const navigate= useNavigate();   // TO NAVIGATE TO RESULTS PAGE WHEN CLICK "ETSI"
 
-    const onSubmit = e => {
-        e.preventDefault();
-        onSearch(query);
-        console.log('Searching for:', query);
-        navigate(`/results/${query}`);
-      };  
+const onSubmit = e => {
+    e.preventDefault();
+
+    const trimmed = query.trim();
+    if (!trimmed) return;   // empty or only spaces: do nothing
+
+    onSearch(trimmed);
+    console.log('Searching for:', trimmed);
+    navigate(`/results/${trimmed}`);
+};  
 
     return (
       
