@@ -5,7 +5,7 @@ const { WordSearch }  = require("./wordSearchModel")
 
 
 const apiKey = process.env.API_KEY;
-//console.log('API_KEY loaded:', apiKey);
+console.log('API_KEY loaded:', apiKey);
 const youtube = google.youtube({ version: 'v3', auth: apiKey});
 
 // Search Finnish videos (region + language filtered)
