@@ -8,6 +8,8 @@ const savedWordRouter = require('./routes/savedWordRoutes');
 const cookieParser = require('cookie-parser');
 const { optionalAuth, ensureUser }  = require('./middleware/authMiddleware.js')
 const path = require('path');
+const authRouter = require('./routes/authRoutes.js')
+
 const app = express();
 
 connectDB();
@@ -25,6 +27,7 @@ app.post('/guest', ensureUser, (req, res) => res.json({ user: req.user }));
 app.use('/api/search', searchRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/saved-words', savedWordRouter);
+app.use('/api/auth', authRouter)
 
 app.use((req, res, next) => {
   if (req.method !== 'GET' || req.path.startsWith('/api')) return next();

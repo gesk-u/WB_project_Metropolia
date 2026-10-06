@@ -12,4 +12,4 @@ userSchema.index(
   { expireAfterSeconds: 60 * 60 * 24 * 30, partialFilterExpression: { isGuest: true } }
 );
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('GuestUser', userSchema);
