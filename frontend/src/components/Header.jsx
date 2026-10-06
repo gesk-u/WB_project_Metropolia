@@ -45,7 +45,6 @@ function Header({ isAuthenticated, setIsAuthenticated }) {
           <NavLink to="/saved" className={navLinkClass}>Saved</NavLink>
           {isAuthenticated ? (
             <>
-              <span className="font-['JetBrains_Mono'] text-[17px] text-[#5A5550]">Welcome</span>
               <button type="button" onClick={handleLogout} className={navItem}>Log out</button>
             </>
           ) : (
