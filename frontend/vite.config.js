@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/WB_project_Metropolia",
+  base: "/",
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
