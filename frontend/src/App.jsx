@@ -10,18 +10,23 @@ import { useState } from 'react';
 import HomeHero from './components/HomeHero';
 import TopFooter from './components/TopFooter';
 
+import Signup from "./components/Signup"
+import Login from "./components/Login"
+
 function App() {
   // API called when the user submits a search query
   const handleSearch = (query) => {
     console.log('Searching for:', query);
   };
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
   return (
     <div className="flex min-h-screen flex-col bg-[#F4F1EC]">
     <Router basename="/WB_project_Metropolia">
     
     <main className="flex w-full flex-grow flex-col items-center">
-      <Header/>
+      <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>
         <Routes>
             <Route path="/" element={
               <div className="flex w-full flex-grow flex-col items-center justify-center px-4 pb-14">  
@@ -42,6 +47,15 @@ function App() {
             />
 
             <Route path="/saved" element={<SavedWordsPage />} />
+
+            <Route path="/login" element={
+              <Login setIsAuthenticated={setIsAuthenticated}/>
+              }
+            />
+            <Route path="/signup" element={
+              <Signup/>
+              }
+            />
         </Routes>
       </main>
       <TopFooter />
