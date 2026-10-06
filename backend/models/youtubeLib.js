@@ -9,7 +9,7 @@ console.log('API_KEY loaded:', apiKey);
 const youtube = google.youtube({ version: 'v3', auth: apiKey});
 
 // Search Finnish videos (region + language filtered)
-async function findFinnishVideos(query, maxResults = 50) {
+async function findFinnishVideos(query, maxResults = 20) {
     const res = await youtube.search.list({
         part: 'snippet',
         q: query,
@@ -94,6 +94,7 @@ async function searchWordInVideo(videoId, targetWord) {
                 context: entry.text,
                 url: `https://youtube.com/watch?v=${videoId}&t=${Math.floor(entry.offset / 1000)}s`,
             });
+            break; 
         }
     }
     return hits;
