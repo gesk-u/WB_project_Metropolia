@@ -23,7 +23,7 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F4F1EC]">
-    <Router basename="/WB_project_Metropolia">
+    <Router>
     
     <main className="flex w-full flex-grow flex-col items-center">
       <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>
