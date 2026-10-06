@@ -4,42 +4,51 @@ const PREFERRED_VOICES = {
   "fi-FI": ["Google Suomi (Natural)", "Chrome OS Suomi", "Satu"],
 };
 
-export const useSpeech = () => {
+//checks once whether the browser supports speech synthesis at all
+const isSupported =
+  typeof window !== "undefined" && "speechSynthesis" in window;
+
+const findVoice = (voices, lang) => {
+  const preferredNames = PREFERRED_VOICES[lang] || [];
+  return (
+    preferredNames
+      .map((name) => voices.find((v) => v.name === name))
+      .find(Boolean) ||
+    voices.find((v) => v.lang.replace("_", "-") === lang) ||
+    voices.find((v) => v.lang.toLowerCase().startsWith(lang.split("-")[0]))
+  );
+};
+
+// the hook now takes the language as an argument
+export const useSpeech = (lang = "fi-FI") => {
   const [voices, setVoices] = useState([]);
   const [speakingId, setSpeakingId] = useState(null);
 
   useEffect(() => {
+    // do nothing if the browser has no speechSynthesis
+    if (!isSupported) return;
+
     const loadVoices = () => setVoices(window.speechSynthesis.getVoices());
     loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
+
+    return () =>
+      window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
   }, []);
 
   const speak = useCallback(
-    (text, { lang = "fi-FI", rate = 0.9, id = null } = {}) => {
+    (text, { lang: l = lang, rate = 0.9, id = null } = {}) => {
+      // ADDED: guard for unsupported browsers
+      if (!isSupported) return;
+
       window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
+      utterance.lang = l;
       utterance.rate = rate;
 
-      // fetch the voice list fresh at call time, instead of relying on state,
-      // since speechSynthesis.getVoices() can be inconsistent right after onvoiceschanged
-      const currentVoices = window.speechSynthesis.getVoices();
-      const preferredNames = PREFERRED_VOICES[lang] || [];
-      const voice =
-        preferredNames
-          .map((name) => currentVoices.find((v) => v.name === name))
-          .find(Boolean) ||
-        currentVoices.find((v) => v.lang === lang) ||
-        currentVoices.find((v) => v.lang.startsWith(lang.split("-")[0]));
-
-      // debug logs, remove once voice selection is confirmed working
-      console.log(
-        "Available fi-FI voices:",
-        currentVoices.filter((v) => v.lang === "fi-FI").map((v) => v.name),
-      );
-      console.log("Selected voice:", voice?.name);
-
+      const voice = findVoice(window.speechSynthesis.getVoices(), l);
       if (voice) utterance.voice = voice;
 
       utterance.onstart = () => setSpeakingId(id);
@@ -48,8 +57,11 @@ export const useSpeech = () => {
 
       window.speechSynthesis.speak(utterance);
     },
-    [],
+    [lang],
   );
 
-  return { speak, speakingId, voicesReady: voices.length > 0 };
+  // true only if the browser supports speech AND a matching voice exists
+  const canSpeak = isSupported && !!findVoice(voices, lang);
+
+  return { speak, speakingId, canSpeak };
 };
