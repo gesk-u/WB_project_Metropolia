@@ -1,0 +1,822 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Finnish Word Learning API",
+    "description": "API for Finnish vocabulary learning: AI-generated word info, YouTube subtitle search, saved words, guest sessions and authentication. Guest sessions use an httpOnly token cookie (JWT, 30 days). CORS allows origin http://localhost:5173 with credentials. Any unmatched request returns 404 {\"error\": \"unknown endpoint\"}.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Session",
+      "description": "Current user and guest session"
+    },
+    {
+      "name": "Auth",
+      "description": "Registration and login"
+    },
+    {
+      "name": "AI",
+      "description": "AI-generated dictionary info and example sentences"
+    },
+    {
+      "name": "Saved Words",
+      "description": "Words saved by a user (or guest) together with a video clip"
+    },
+    {
+      "name": "Search",
+      "description": "Search Finnish YouTube videos for a word in subtitles"
+    }
+  ],
+  "paths": {
+    "/me": {
+      "get": {
+        "tags": ["Session"],
+        "summary": "Get the current user",
+        "description": "Returns the user identified by the token cookie, or null for anonymous visitors.",
+        "operationId": "getMe",
+        "security": [
+          {},
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user or null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/SessionUser"
+                        }
+                      ],
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guest": {
+      "post": {
+        "tags": ["Session"],
+        "summary": "Create (or reuse) a guest user",
+        "description": "If no valid cookie is present, creates a guest user and sets the token cookie. Guests inactive for 30 days are deleted automatically.",
+        "operationId": "createGuest",
+        "security": [
+          {},
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The guest user",
+            "headers": {
+              "Set-Cookie": {
+                "description": "httpOnly token cookie (JWT, 30 days, SameSite=Lax; Secure in production). Only set when a new guest user is created.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/SessionUser"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "operationId": "register",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPublic"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing name/password, or password shorter than 8 characters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Username already taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Log in and receive a JWT",
+        "description": "Returns a JWT that expires in 2 hours.",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing name or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "Returns a JWT (expires in 2 hours) in the response body. Note: the token is not set as a cookie, and the saved-words endpoints currently identify users only by the token cookie."
+    },
+    "/api/ai": {
+      "post": {
+        "tags": ["AI"],
+        "summary": "Generate dictionary info and example sentences for a Finnish word",
+        "description": "Uses an AI model to return IPA transcription, a short definition and 5 example sentences. The word is trimmed and lowercased, must be at most 50 characters, and may contain only letters a-z, Finnish letters, spaces, hyphens and apostrophes.",
+        "operationId": "generateAiText",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["word"],
+                "properties": {
+                  "word": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "example": "yst\u00e4v\u00e4"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Word information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiWordInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing word",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Word not recognized as a Finnish word",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "AI provider rate limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to generate response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/saved-words": {
+      "get": {
+        "tags": ["Saved Words"],
+        "summary": "List saved words",
+        "description": "Returns the current users saved words (identified by the token cookie), newest first. Returns an empty array for anonymous visitors.",
+        "operationId": "getSavedWords",
+        "security": [
+          {},
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of saved words",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedWord"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Could not load saved words",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Saved Words"],
+        "summary": "Save a word with its video clip",
+        "description": "Creates or updates (upsert by user + word) a saved word. If there is no valid cookie, the ensureUser middleware creates a guest user and sets the token cookie. If videoTitle is omitted it is fetched from YouTube oEmbed.",
+        "operationId": "saveWord",
+        "security": [
+          {},
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveWordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The saved word",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedWord"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "httpOnly token cookie (JWT, 30 days, SameSite=Lax; Secure in production). Only set when a new guest user is created.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "word, videoId, sentence or start missing/invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Could not save word",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/saved-words/{id}": {
+      "delete": {
+        "tags": ["Saved Words"],
+        "summary": "Delete a saved word",
+        "operationId": "deleteSavedWord",
+        "security": [
+          {},
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "MongoDB ObjectId of the saved word",
+            "schema": {
+              "type": "string",
+              "example": "665f1c2e8a1b2c3d4e5f6a7b"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Word not found (or anonymous visitor)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Could not delete word",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/search": {
+      "post": {
+        "tags": ["Search"],
+        "summary": "Find Finnish YouTube videos where a word is spoken",
+        "description": "Searches Finnish YouTube videos and their transcripts for the word. Results are cached in MongoDB for 7 days. Note: parameters are read from the query string even though the method is POST.",
+        "operationId": "searchVideos",
+        "parameters": [
+          {
+            "name": "word",
+            "in": "query",
+            "required": true,
+            "description": "Word to search for",
+            "schema": {
+              "type": "string",
+              "example": "yst\u00e4v\u00e4"
+            }
+          },
+          {
+            "name": "lemma",
+            "in": "query",
+            "required": false,
+            "description": "Base form of the word (used as part of the cache key)",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "word parameter required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Search failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "YouTube API daily quota exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token",
+        "description": "httpOnly JWT cookie (30 days) issued for guest users. Optional on all endpoints: requests without it are treated as anonymous."
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Defined by the unused requireAuth middleware (expects Authorization: Bearer <JWT>). Not applied to any current route."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "something went wrong"
+          }
+        },
+        "required": ["error"]
+      },
+      "AuthRequest": {
+        "type": "object",
+        "required": ["name", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "matti"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "example": "secret1234"
+          }
+        }
+      },
+      "UserPublic": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "665f1c2e8a1b2c3d4e5f6a7b"
+          },
+          "name": {
+            "type": "string",
+            "example": "matti"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT, valid for 2 hours"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserPublic"
+          }
+        }
+      },
+      "AiWordInfo": {
+        "type": "object",
+        "properties": {
+          "word": {
+            "type": "string",
+            "example": "yst\u00e4v\u00e4"
+          },
+          "transcription": {
+            "type": "string",
+            "description": "IPA transcription",
+            "example": "\u02c8yst\u00e6\u028b\u00e6"
+          },
+          "definition": {
+            "type": "string",
+            "example": "A person you like and trust."
+          },
+          "sentences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Minulla on hyv\u00e4 yst\u00e4v\u00e4.",
+              "Yst\u00e4v\u00e4ni asuu Helsingiss\u00e4."
+            ]
+          }
+        }
+      },
+      "SaveWordRequest": {
+        "type": "object",
+        "required": ["word", "videoId", "sentence", "start"],
+        "properties": {
+          "word": {
+            "type": "string",
+            "description": "Searched word (trimmed, lowercased)",
+            "example": "yst\u00e4v\u00e4"
+          },
+          "matchedForm": {
+            "type": "string",
+            "description": "Form that appears in the subtitle; defaults to word",
+            "example": "yst\u00e4v\u00e4ni"
+          },
+          "sentence": {
+            "type": "string",
+            "description": "Subtitle line containing the word"
+          },
+          "videoId": {
+            "type": "string",
+            "example": "dQw4w9WgXcQ",
+            "minLength": 11,
+            "maxLength": 11,
+            "description": "YouTube video id (11 characters: letters, digits, underscore, hyphen)"
+          },
+          "videoTitle": {
+            "type": "string",
+            "description": "Optional; fetched from YouTube if omitted"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Seconds into the video",
+            "example": 42.5
+          }
+        }
+      },
+      "SavedWord": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "word": {
+            "type": "string"
+          },
+          "matchedForm": {
+            "type": "string"
+          },
+          "sentence": {
+            "type": "string"
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "videoTitle": {
+            "type": "string"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6,
+            "default": 0,
+            "description": "Spaced repetition level"
+          },
+          "nextReviewAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SearchHit": {
+        "type": "object",
+        "properties": {
+          "videoId": {
+            "type": "string",
+            "example": "dQw4w9WgXcQ"
+          },
+          "startSec": {
+            "type": "number",
+            "description": "Start of the subtitle line in seconds"
+          },
+          "text": {
+            "type": "string",
+            "description": "Subtitle text"
+          },
+          "seekSec": {
+            "type": "integer",
+            "description": "startSec minus 1.5s lead-in, rounded, min 0"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://youtube.com/watch?v=dQw4w9WgXcQ&t=41s"
+          }
+        }
+      },
+      "SearchResponse": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "lemma": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchHit"
+            }
+          }
+        }
+      },
+      "SessionUser": {
+        "type": "object",
+        "description": "Guest user document",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "isGuest": {
+            "type": "boolean",
+            "default": true
+          },
+          "email": {
+            "type": "string"
+          },
+          "lastActiveAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "__v": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}
